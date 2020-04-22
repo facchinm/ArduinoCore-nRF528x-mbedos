@@ -15,9 +15,14 @@
  * limitations under the License.
  */
 
+#include "Arduino.h"
+
+#if DEVICE_USBDEVICE && defined(SERIAL_CDC)
+
 #include "stdint.h"
 #include "PluggableUSBSerial.h"
 #include "usb_phy_api.h"
+#include "mbed.h"
 
 using namespace arduino;
 
@@ -90,8 +95,14 @@ void USBSerial::data_rx()
     USBCDC::assert_locked();
 
     //call a potential handler
-    if (rx) {
-        rx.call();
+    int i = 0;
+    while (i < howManyCallbacks) {
+        if (rx[i]) {
+            rx[i].call();
+        } else {
+            break;
+        }
+        i++;
     }
 }
 
@@ -114,3 +125,5 @@ bool USBSerial::connected()
 }
 
 USBSerial SerialUSB(false);
+
+#endif

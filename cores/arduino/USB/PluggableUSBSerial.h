@@ -21,6 +21,7 @@
 #include "Arduino.h"
 #include "USBCDC.h"
 #include "platform/Stream.h"
+#include "mbed/rtos/rtos.h"
 #include "Callback.h"
 
 /**
@@ -43,6 +44,8 @@
 * }
 * @endcode
 */
+
+#define MAX_CALLBACKS_ON_IRQ    4
 
 namespace arduino {
 
@@ -155,7 +158,7 @@ public:
         USBCDC::lock();
 
         if ((mptr != NULL) && (tptr != NULL)) {
-            rx = ::mbed::Callback<void()>(mptr, tptr);
+            rx[howManyCallbacks++] = ::mbed::Callback<void()>(mptr, tptr);
         }
 
         USBCDC::unlock();
@@ -171,7 +174,7 @@ public:
         USBCDC::lock();
 
         if (fptr != NULL) {
-            rx = ::mbed::Callback<void()>(fptr);
+            rx[howManyCallbacks++] = ::mbed::Callback<void()>(fptr);
         }
 
         USBCDC::unlock();
@@ -186,7 +189,7 @@ public:
     {
         USBCDC::lock();
 
-        rx = cb;
+        rx[howManyCallbacks++] = cb;
 
         USBCDC::unlock();
     }
@@ -270,7 +273,8 @@ protected:
     }
 
 private:
-    ::mbed::Callback<void()> rx;
+    ::mbed::Callback<void()> rx[MAX_CALLBACKS_ON_IRQ];
+    int howManyCallbacks = 0;
     void (*_settings_changed_callback)(int baud, int bits, int parity, int stop);
 };
 }

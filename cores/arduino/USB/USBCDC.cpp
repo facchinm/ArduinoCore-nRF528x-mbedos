@@ -15,6 +15,12 @@
  * limitations under the License.
  */
 
+
+#include "Arduino.h"
+#include "PeripheralPins.h"
+
+#if DEVICE_USBDEVICE && defined(SERIAL_CDC)
+
 #include "stdint.h"
 #include "USBCDC.h"
 #include "EndpointResolver.h"
@@ -35,7 +41,11 @@ static const uint8_t cdc_line_coding_default[7] = {0x80, 0x25, 0x00, 0x00, 0x00,
 #define CLS_DTR   (1 << 0)
 #define CLS_RTS   (1 << 1)
 
+#if defined(MBED_CONF_TARGET_USB_SPEED) && (MBED_CONF_TARGET_USB_SPEED == USE_USB_OTG_HS)
+#define CDC_MAX_PACKET_SIZE    512
+#else
 #define CDC_MAX_PACKET_SIZE    64
+#endif
 
 class USBCDC::AsyncWrite: public AsyncOp {
 public:
@@ -611,3 +621,5 @@ const uint8_t *USBCDC::configuration_desc(uint8_t index)
         return NULL;
     }
 }
+
+#endif
