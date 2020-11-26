@@ -1,0 +1,26 @@
+From 787ac29a0dea9358c2385920b0ad2edf17f4a54a Mon Sep 17 00:00:00 2001
+From: George Beckstein <donbeckstein@live.com>
+Date: Fri, 10 Jan 2020 11:32:47 -0500
+Subject: [PATCH 09/17] Update SDK config for nRF52840 to disable UART1
+ instance (Mbed serial port uses UARTE peripheral)
+
+---
+ .../TARGET_NRF52/TARGET_MCU_NRF52840/config/sdk_config.h        | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/targets/TARGET_NORDIC/TARGET_NRF5x/TARGET_NRF52/TARGET_MCU_NRF52840/config/sdk_config.h b/targets/TARGET_NORDIC/TARGET_NRF5x/TARGET_NRF52/TARGET_MCU_NRF52840/config/sdk_config.h
+index 9a45b0a54f..e25b3086f9 100644
+--- a/targets/TARGET_NORDIC/TARGET_NRF5x/TARGET_NRF52/TARGET_MCU_NRF52840/config/sdk_config.h
++++ b/targets/TARGET_NORDIC/TARGET_NRF5x/TARGET_NRF52/TARGET_MCU_NRF52840/config/sdk_config.h
+@@ -5665,7 +5665,7 @@
+ // <e> UART1_ENABLED - Enable UART1 instance
+ //==========================================================
+ #ifndef UART1_ENABLED
+-#define UART1_ENABLED 1
++#define UART1_ENABLED 0
+ #endif
+ // </e>
+ 
+-- 
+2.29.2
+

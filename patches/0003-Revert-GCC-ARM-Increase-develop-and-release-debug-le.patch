@@ -1,7 +1,7 @@
-From d07f7e136287c4b1a8533fe88f52299d930c8c29 Mon Sep 17 00:00:00 2001
+From e12c0967a114bd6931b920635be479ed63fa20cc Mon Sep 17 00:00:00 2001
 From: Martino Facchin <m.facchin@arduino.cc>
 Date: Wed, 31 Jul 2019 12:42:57 +0200
-Subject: [PATCH 3/3] Revert "GCC ARM: Increase develop and release debug
+Subject: [PATCH 03/17] Revert "GCC ARM: Increase develop and release debug
  level"
 
 This reverts commit 4e992cd901f8ab7241edf74910804aea3fa5e32c.
@@ -11,7 +11,7 @@ This reverts commit 4e992cd901f8ab7241edf74910804aea3fa5e32c.
  2 files changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/tools/profiles/develop.json b/tools/profiles/develop.json
-index 04e74fbb0d..513f645458 100644
+index 7dd8a96d17..6cfbb99c6d 100644
 --- a/tools/profiles/develop.json
 +++ b/tools/profiles/develop.json
 @@ -5,7 +5,7 @@
@@ -24,7 +24,7 @@ index 04e74fbb0d..513f645458 100644
          "c": ["-std=gnu11"],
          "cxx": ["-std=gnu++14", "-fno-rtti", "-Wvla"],
 diff --git a/tools/profiles/release.json b/tools/profiles/release.json
-index 31bcbbc47f..27b5bb1a3c 100644
+index 2aab24f6c8..be5387dbb1 100644
 --- a/tools/profiles/release.json
 +++ b/tools/profiles/release.json
 @@ -5,7 +5,7 @@
@@ -37,5 +37,5 @@ index 31bcbbc47f..27b5bb1a3c 100644
          "c": ["-std=gnu11"],
          "cxx": ["-std=gnu++14", "-fno-rtti", "-Wvla"],
 -- 
-2.23.0
+2.29.2
 

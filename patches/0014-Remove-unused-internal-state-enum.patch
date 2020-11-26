@@ -1,0 +1,35 @@
+From 0de8abab1a9aec53730404feea1a64147eaa0bff Mon Sep 17 00:00:00 2001
+From: George Beckstein <donbeckstein@live.com>
+Date: Fri, 20 Dec 2019 14:34:25 -0500
+Subject: [PATCH 14/17] Remove unused internal state enum
+
+---
+ .../TARGET_NRF5x/TARGET_NRF52/i2c_api.c              | 12 ------------
+ 1 file changed, 12 deletions(-)
+
+diff --git a/targets/TARGET_NORDIC/TARGET_NRF5x/TARGET_NRF52/i2c_api.c b/targets/TARGET_NORDIC/TARGET_NRF5x/TARGET_NRF52/i2c_api.c
+index a44634e18e..e25da4e854 100644
+--- a/targets/TARGET_NORDIC/TARGET_NRF5x/TARGET_NRF52/i2c_api.c
++++ b/targets/TARGET_NORDIC/TARGET_NRF5x/TARGET_NRF52/i2c_api.c
+@@ -88,18 +88,6 @@ typedef enum {
+     NORDIC_TWI_STATE_BUSY
+ } nordic_nrf5_twi_state_t;
+ 
+-#if DEVICE_I2CSLAVE
+-
+-/* To properly uninitialize the last-used driver, we need to know if
+- * it was a master (nrfx_twi_...) or a slave (nrfx_twis_...)
+- */
+-typedef enum {
+-	NORDIC_TWI_INITIALIZED_AS_MASTER,
+-	NORDIC_TWI_INITIALIZED_AS_SLAVE,
+-	NORDIC_TWI_UNINITIALIZED
+-} nordic_nrf5_twi_slave_state_t;
+-#endif
+-
+ /* Forward declaration. These functions are implemented in the driver but not
+  * set up in the NVIC due to it being relocated.
+  */
+-- 
+2.29.2
+

@@ -1,0 +1,26 @@
+From f0f690176b2c9196b1d698a90559836def14bc87 Mon Sep 17 00:00:00 2001
+From: George Beckstein <donbeckstein@live.com>
+Date: Fri, 10 Jan 2020 11:30:52 -0500
+Subject: [PATCH 08/17] Replace preprocessor "UARTx_ENABLED" with
+ "NRFX_UARTEx_ENABLED".
+
+---
+ .../TARGET_NORDIC_CORDIO/TARGET_NRF5x/stack/sources/pal_uart.c  | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/features/FEATURE_BLE/targets/TARGET_NORDIC/TARGET_NORDIC_CORDIO/TARGET_NRF5x/stack/sources/pal_uart.c b/features/FEATURE_BLE/targets/TARGET_NORDIC/TARGET_NORDIC_CORDIO/TARGET_NRF5x/stack/sources/pal_uart.c
+index 60f845db8c..5dbe137793 100644
+--- a/features/FEATURE_BLE/targets/TARGET_NORDIC/TARGET_NORDIC_CORDIO/TARGET_NRF5x/stack/sources/pal_uart.c
++++ b/features/FEATURE_BLE/targets/TARGET_NORDIC/TARGET_NORDIC_CORDIO/TARGET_NRF5x/stack/sources/pal_uart.c
+@@ -52,7 +52,7 @@ static struct
+   PalUartConfig_t       config;         /*!< PAL UART configuration. */
+   PalUartState_t        state;          /*!< PAL UART state. */
+   nrfx_uarte_t          uart;           /*!< NRF UART driver instance */
+-} palUartCb[UART0_ENABLED + UART1_ENABLED] = {{0, {0}, 0, {NRF_UARTE0, NRFX_UARTE0_INST_IDX}}};
++} palUartCb[NRFX_UARTE0_ENABLED + NRFX_UARTE1_ENABLED] = {{0, {0}, 0, {NRF_UARTE0, NRFX_UARTE0_INST_IDX}}};
+ 
+ /**************************************************************************************************
+   Local Functions
+-- 
+2.29.2
+

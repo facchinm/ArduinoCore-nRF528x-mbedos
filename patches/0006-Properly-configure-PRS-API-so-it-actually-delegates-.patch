@@ -1,0 +1,144 @@
+From 77d31fb2873a34db16e4ac7b705040c2890c0bb6 Mon Sep 17 00:00:00 2001
+From: George Beckstein <donbeckstein@live.com>
+Date: Fri, 20 Dec 2019 13:56:40 -0500
+Subject: [PATCH 06/17] Properly configure PRS API so it actually delegates the
+ shared interrupt slot to the appropriate peripheral
+
+---
+ .../TARGET_MCU_NRF52832/config/sdk_config.h   | 36 ++++++++++++++++++
+ .../TARGET_MCU_NRF52840/config/sdk_config.h   | 38 +++++++++++++++++++
+ .../modules/nrfx/drivers/src/nrfx_twi.c       |  4 --
+ 3 files changed, 74 insertions(+), 4 deletions(-)
+
+diff --git a/targets/TARGET_NORDIC/TARGET_NRF5x/TARGET_NRF52/TARGET_MCU_NRF52832/config/sdk_config.h b/targets/TARGET_NORDIC/TARGET_NRF5x/TARGET_NRF52/TARGET_MCU_NRF52832/config/sdk_config.h
+index 5cac1461c6..9204af074b 100644
+--- a/targets/TARGET_NORDIC/TARGET_NRF5x/TARGET_NRF52/TARGET_MCU_NRF52832/config/sdk_config.h
++++ b/targets/TARGET_NORDIC/TARGET_NRF5x/TARGET_NRF52/TARGET_MCU_NRF52832/config/sdk_config.h
+@@ -4038,9 +4038,45 @@
+ 
+ // </e>
+ 
++// <e> NRFX_PRS_ENABLED - nrfx_prs - Peripheral Resource Sharing module
++//==========================================================
+ #ifndef NRFX_PRS_ENABLED
+ #define NRFX_PRS_ENABLED 1
+ #endif
++// <q> NRFX_PRS_BOX_0_ENABLED  - Enables box 0 in the module.
++
++
++#ifndef NRFX_PRS_BOX_0_ENABLED
++#define NRFX_PRS_BOX_0_ENABLED 1
++#endif
++
++// <q> NRFX_PRS_BOX_1_ENABLED  - Enables box 1 in the module.
++
++
++#ifndef NRFX_PRS_BOX_1_ENABLED
++#define NRFX_PRS_BOX_1_ENABLED 1
++#endif
++
++// <q> NRFX_PRS_BOX_2_ENABLED  - Enables box 2 in the module.
++
++
++#ifndef NRFX_PRS_BOX_2_ENABLED
++#define NRFX_PRS_BOX_2_ENABLED 1
++#endif
++
++// <q> NRFX_PRS_BOX_3_ENABLED  - Enables box 3 in the module.
++
++
++#ifndef NRFX_PRS_BOX_3_ENABLED
++#define NRFX_PRS_BOX_3_ENABLED 1
++#endif
++
++// <q> NRFX_PRS_BOX_4_ENABLED  - Enables box 4 in the module.
++
++
++#ifndef NRFX_PRS_BOX_4_ENABLED
++#define NRFX_PRS_BOX_4_ENABLED 1
++#endif
+ 
+ // </e>
+ 
+diff --git a/targets/TARGET_NORDIC/TARGET_NRF5x/TARGET_NRF52/TARGET_MCU_NRF52840/config/sdk_config.h b/targets/TARGET_NORDIC/TARGET_NRF5x/TARGET_NRF52/TARGET_MCU_NRF52840/config/sdk_config.h
+index aa4ad7668b..92a8e46d81 100644
+--- a/targets/TARGET_NORDIC/TARGET_NRF5x/TARGET_NRF52/TARGET_MCU_NRF52840/config/sdk_config.h
++++ b/targets/TARGET_NORDIC/TARGET_NRF5x/TARGET_NRF52/TARGET_MCU_NRF52840/config/sdk_config.h
+@@ -4040,9 +4040,47 @@
+ 
+ // </e>
+ 
++// <e> NRFX_PRS_ENABLED - nrfx_prs - Peripheral Resource Sharing module
++//==========================================================
+ #ifndef NRFX_PRS_ENABLED
+ #define NRFX_PRS_ENABLED 1
+ #endif
++// <q> NRFX_PRS_BOX_0_ENABLED  - Enables box 0 in the module.
++
++
++#ifndef NRFX_PRS_BOX_0_ENABLED
++#define NRFX_PRS_BOX_0_ENABLED 1
++#endif
++
++// <q> NRFX_PRS_BOX_1_ENABLED  - Enables box 1 in the module.
++
++
++#ifndef NRFX_PRS_BOX_1_ENABLED
++#define NRFX_PRS_BOX_1_ENABLED 1
++#endif
++
++// <q> NRFX_PRS_BOX_2_ENABLED  - Enables box 2 in the module.
++
++
++#ifndef NRFX_PRS_BOX_2_ENABLED
++#define NRFX_PRS_BOX_2_ENABLED 1
++#endif
++
++// <q> NRFX_PRS_BOX_3_ENABLED  - Enables box 3 in the module.
++
++
++#ifndef NRFX_PRS_BOX_3_ENABLED
++#define NRFX_PRS_BOX_3_ENABLED 1
++#endif
++
++// <q> NRFX_PRS_BOX_4_ENABLED  - Enables box 4 in the module.
++
++
++#ifndef NRFX_PRS_BOX_4_ENABLED
++#define NRFX_PRS_BOX_4_ENABLED 1
++#endif
++
++// </e>
+ 
+ // <e> NRFX_TWI_ENABLED - nrfx_twi - TWI peripheral driver
+ //==========================================================
+diff --git a/targets/TARGET_NORDIC/TARGET_NRF5x/TARGET_SDK_15_0/modules/nrfx/drivers/src/nrfx_twi.c b/targets/TARGET_NORDIC/TARGET_NRF5x/TARGET_SDK_15_0/modules/nrfx/drivers/src/nrfx_twi.c
+index 3444ee091d..7391c577ee 100644
+--- a/targets/TARGET_NORDIC/TARGET_NRF5x/TARGET_SDK_15_0/modules/nrfx/drivers/src/nrfx_twi.c
++++ b/targets/TARGET_NORDIC/TARGET_NRF5x/TARGET_SDK_15_0/modules/nrfx/drivers/src/nrfx_twi.c
+@@ -706,22 +706,18 @@ static void twi_irq_handler(NRF_TWI_Type * p_twi, twi_control_block_t * p_cb)
+ 
+ }
+ 
+-#if 0
+ #if NRFX_CHECK(NRFX_TWI0_ENABLED)
+ void nrfx_twi_0_irq_handler(void)
+ {
+     twi_irq_handler(NRF_TWI0, &m_cb[NRFX_TWI0_INST_IDX]);
+ }
+ #endif
+-#endif
+ 
+-#if 0
+ #if NRFX_CHECK(NRFX_TWI1_ENABLED)
+ void nrfx_twi_1_irq_handler(void)
+ {
+     twi_irq_handler(NRF_TWI1, &m_cb[NRFX_TWI1_INST_IDX]);
+ }
+ #endif
+-#endif
+ 
+ #endif // NRFX_CHECK(NRFX_TWI_ENABLED)
+-- 
+2.29.2
+

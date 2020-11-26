@@ -1,0 +1,34 @@
+From 8856598e7d9157c9e578f481c22e20fbd6a6e336 Mon Sep 17 00:00:00 2001
+From: George Beckstein <donbeckstein@live.com>
+Date: Fri, 3 Apr 2020 05:43:17 -0400
+Subject: [PATCH 16/17] Fixed typo in target.json
+
+---
+ targets/targets.json | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/targets/targets.json b/targets/targets.json
+index 9875a036cb..95ecfaaa7e 100644
+--- a/targets/targets.json
++++ b/targets/targets.json
+@@ -7504,7 +7504,7 @@
+             "FLASH",
+             "I2C",
+             "I2C_ASYNCH",
+-            "I2C_SLAVE",
++            "I2CSLAVE",
+             "INTERRUPTIN",
+             "ITM",
+             "LPTICKER",
+@@ -7807,7 +7807,7 @@
+             "FLASH",
+             "I2C",
+             "I2C_ASYNCH",
+-            "I2C_SLAVE",
++            "I2CSLAVE",
+             "INTERRUPTIN",
+             "ITM",
+             "LPTICKER",
+-- 
+2.29.2
+

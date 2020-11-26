@@ -1,0 +1,90 @@
+From 7f9cab9d3dce821d262157800bb5ff049802c872 Mon Sep 17 00:00:00 2001
+From: George Beckstein <donbeckstein@live.com>
+Date: Fri, 20 Dec 2019 14:10:15 -0500
+Subject: [PATCH 11/17] Enable I2CSLAVE for nRF52 targets
+
+---
+ .../TARGET_NRF52/TARGET_MCU_NRF52832/config/sdk_config.h    | 6 +++---
+ .../TARGET_NRF52/TARGET_MCU_NRF52840/config/sdk_config.h    | 6 +++---
+ targets/targets.json                                        | 2 ++
+ 3 files changed, 8 insertions(+), 6 deletions(-)
+
+diff --git a/targets/TARGET_NORDIC/TARGET_NRF5x/TARGET_NRF52/TARGET_MCU_NRF52832/config/sdk_config.h b/targets/TARGET_NORDIC/TARGET_NRF5x/TARGET_NRF52/TARGET_MCU_NRF52832/config/sdk_config.h
+index cca54c6948..b1112d715a 100644
+--- a/targets/TARGET_NORDIC/TARGET_NRF5x/TARGET_NRF52/TARGET_MCU_NRF52832/config/sdk_config.h
++++ b/targets/TARGET_NORDIC/TARGET_NRF5x/TARGET_NRF52/TARGET_MCU_NRF52832/config/sdk_config.h
+@@ -3908,20 +3908,20 @@
+ // <e> NRFX_TWIS_ENABLED - nrfx_twis - TWIS peripheral driver
+ //==========================================================
+ #ifndef NRFX_TWIS_ENABLED
+-#define NRFX_TWIS_ENABLED 0
++#define NRFX_TWIS_ENABLED 1
+ #endif
+ // <q> NRFX_TWIS0_ENABLED  - Enable TWIS0 instance
+  
+ 
+ #ifndef NRFX_TWIS0_ENABLED
+-#define NRFX_TWIS0_ENABLED 0
++#define NRFX_TWIS0_ENABLED 1
+ #endif
+ 
+ // <q> NRFX_TWIS1_ENABLED  - Enable TWIS1 instance
+  
+ 
+ #ifndef NRFX_TWIS1_ENABLED
+-#define NRFX_TWIS1_ENABLED 0
++#define NRFX_TWIS1_ENABLED 1
+ #endif
+ 
+ // <q> NRFX_TWIS_ASSUME_INIT_AFTER_RESET_ONLY  - Assume that any instance would be initialized only once
+diff --git a/targets/TARGET_NORDIC/TARGET_NRF5x/TARGET_NRF52/TARGET_MCU_NRF52840/config/sdk_config.h b/targets/TARGET_NORDIC/TARGET_NRF5x/TARGET_NRF52/TARGET_MCU_NRF52840/config/sdk_config.h
+index e25b3086f9..4bef366d3f 100644
+--- a/targets/TARGET_NORDIC/TARGET_NRF5x/TARGET_NRF52/TARGET_MCU_NRF52840/config/sdk_config.h
++++ b/targets/TARGET_NORDIC/TARGET_NRF5x/TARGET_NRF52/TARGET_MCU_NRF52840/config/sdk_config.h
+@@ -3908,20 +3908,20 @@
+ // <e> NRFX_TWIS_ENABLED - nrfx_twis - TWIS peripheral driver
+ //==========================================================
+ #ifndef NRFX_TWIS_ENABLED
+-#define NRFX_TWIS_ENABLED 0
++#define NRFX_TWIS_ENABLED 1
+ #endif
+ // <q> NRFX_TWIS0_ENABLED  - Enable TWIS0 instance
+  
+ 
+ #ifndef NRFX_TWIS0_ENABLED
+-#define NRFX_TWIS0_ENABLED 0
++#define NRFX_TWIS0_ENABLED 1
+ #endif
+ 
+ // <q> NRFX_TWIS1_ENABLED  - Enable TWIS1 instance
+  
+ 
+ #ifndef NRFX_TWIS1_ENABLED
+-#define NRFX_TWIS1_ENABLED 0
++#define NRFX_TWIS1_ENABLED 1
+ #endif
+ 
+ // <q> NRFX_TWIS_ASSUME_INIT_AFTER_RESET_ONLY  - Assume that any instance would be initialized only once
+diff --git a/targets/targets.json b/targets/targets.json
+index 326d5ccfb8..9875a036cb 100644
+--- a/targets/targets.json
++++ b/targets/targets.json
+@@ -7504,6 +7504,7 @@
+             "FLASH",
+             "I2C",
+             "I2C_ASYNCH",
++            "I2C_SLAVE",
+             "INTERRUPTIN",
+             "ITM",
+             "LPTICKER",
+@@ -7806,6 +7807,7 @@
+             "FLASH",
+             "I2C",
+             "I2C_ASYNCH",
++            "I2C_SLAVE",
+             "INTERRUPTIN",
+             "ITM",
+             "LPTICKER",
+-- 
+2.29.2
+
