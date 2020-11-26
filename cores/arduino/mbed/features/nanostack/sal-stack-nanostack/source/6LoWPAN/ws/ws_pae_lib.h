@@ -31,18 +31,26 @@ typedef struct {
 
 typedef NS_LIST_HEAD(kmp_entry_t, link) kmp_list_t;
 
-typedef struct {
+typedef struct supp_entry_s {
     kmp_list_t kmp_list;               /**< Ongoing KMP negotiations */
     kmp_addr_t addr;                   /**< EUI-64 (Relay IP address, Relay port) */
     sec_prot_keys_t sec_keys;          /**< Security keys */
     uint32_t ticks;                    /**< Ticks */
     uint16_t retry_ticks;              /**< Retry ticks */
+    uint16_t store_ticks;              /**< NVM store ticks */
     bool active : 1;                   /**< Is active */
     bool access_revoked : 1;           /**< Nodes access is revoked */
     ns_list_link_t link;               /**< Link */
 } supp_entry_t;
 
 typedef NS_LIST_HEAD(supp_entry_t, link) supp_list_t;
+
+typedef struct {
+    kmp_shared_comp_t *data;           /**< KMP shared component data */
+    ns_list_link_t link;               /**< Link */
+} shared_comp_entry_t;
+
+typedef NS_LIST_HEAD(shared_comp_entry_t, link) shared_comp_list_t;
 
 /**
  * ws_pae_lib_kmp_list_init initializes KMP list
@@ -122,6 +130,27 @@ kmp_api_t *ws_pae_lib_kmp_list_instance_id_get(kmp_list_t *kmp_list, uint8_t ins
  *
  */
 kmp_entry_t *ws_pae_lib_kmp_list_entry_get(kmp_list_t *kmp_list, kmp_api_t *kmp);
+
+/**
+ * ws_pae_lib_kmp_list_empty checks whether KMP list is empty
+ *
+ * \param kmp_list KMP list
+ *
+ * \return true list is empty
+ * \return false list is not empty
+ *
+ */
+bool ws_pae_lib_kmp_list_empty(kmp_list_t *kmp_list);
+
+/**
+ * ws_pae_lib_kmp_list_count counts entries on KMP list
+ *
+ * \param kmp_list KMP list
+ *
+ * \return count of entries on the list
+ *
+ */
+uint8_t ws_pae_lib_kmp_list_count(kmp_list_t *kmp_list);
 
 /**
  * ws_pae_lib_kmp_timer_start starts KMP timer
@@ -215,6 +244,7 @@ void ws_pae_lib_supp_list_delete(supp_list_t *supp_list);
 /**
  *  ws_pae_lib_supp_list_timer_update updates timers on supplicant list
  *
+ * \param instance Instance
  * \param active_supp_list list of active supplicants
  * \param inactive_supp_list list of inactive supplicants
  * \param ticks timer ticks
@@ -223,17 +253,16 @@ void ws_pae_lib_supp_list_delete(supp_list_t *supp_list);
  * \return true timer needs still to be running
  * \return false timer can be stopped
  */
-bool ws_pae_lib_supp_list_timer_update(supp_list_t *active_supp_list, supp_list_t *inactive_supp_list, uint16_t ticks, ws_pae_lib_kmp_timer_timeout timeout);
+bool ws_pae_lib_supp_list_timer_update(void *instance, supp_list_t *active_supp_list, uint16_t ticks, ws_pae_lib_kmp_timer_timeout timeout);
 
 /**
  *  ws_pae_lib_supp_list_slow_timer_update updates slow timer on supplicant list
  *
  * \param supp_list list of supplicants
- * \param timer_settings timer settings
  * \param seconds seconds
  *
  */
-void ws_pae_lib_supp_list_slow_timer_update(supp_list_t *supp_list, sec_timer_cfg_t *timer_settings, uint16_t seconds);
+void ws_pae_lib_supp_list_slow_timer_update(supp_list_t *supp_list, uint16_t seconds);
 
 /**
  *  ws_pae_lib_supp_list_timer_update updates supplicant timers
@@ -245,7 +274,7 @@ void ws_pae_lib_supp_list_slow_timer_update(supp_list_t *supp_list, sec_timer_cf
  * \return true timer needs still to be running
  * \return false timer can be stopped
  */
-bool ws_pae_lib_supp_timer_update(supp_entry_t *entry, uint16_t ticks, ws_pae_lib_kmp_timer_timeout timeout);
+bool ws_pae_lib_supp_timer_update(void *instance, supp_entry_t *entry, uint16_t ticks, ws_pae_lib_kmp_timer_timeout timeout);
 
 /**
  *  ws_pae_lib_supp_init initiates supplicant entry
@@ -304,24 +333,34 @@ void ws_pae_lib_supp_list_to_active(supp_list_t *active_supp_list, supp_list_t *
 /**
  *  ws_pae_lib_supp_list_to_inactive move supplicant to inactive supplicants list
  *
+ * \param instance Instance
  * \param active_supp_list list of active supplicants
- * \param inactive_supp_list list of inactive supplicants
  * \param entry supplicant entry
  *
  */
-void ws_pae_lib_supp_list_to_inactive(supp_list_t *active_supp_list, supp_list_t *inactive_supp_list, supp_entry_t *entry);
+void ws_pae_lib_supp_list_to_inactive(void *instance, supp_list_t *active_supp_list, supp_entry_t *entry);
 
 /**
  *  ws_pae_lib_supp_list_purge purge inactive supplicants list
  *
  * \param active_supp_list list of active supplicants
- * \param inactive_supp_list list of inactive supplicants
  * \param max_number maximum number of supplicant entries, can be set to 0 in combination with max_purge
  *                   to free list entries even when maximum number supplicant entries has not been reached
  * \param max_purge maximum number of supplicants to purge in one call, 0 means not limited
  *
  */
-void ws_pae_lib_supp_list_purge(supp_list_t *active_supp_list, supp_list_t *inactive_supp_list, uint16_t max_number, uint8_t max_purge);
+void ws_pae_lib_supp_list_purge(supp_list_t *active_supp_list, uint16_t max_number, uint8_t max_purge);
+
+/**
+ *  ws_pae_lib_supp_list_limit_reached_check check if active supplicant list limit has been reached
+ *
+ * \param active_supp_list list of active supplicants
+ * \param max_number maximum number of supplicant entries
+ *
+ * \return true limit has been reached
+ * \return false limit has not been reached
+ */
+bool ws_pae_lib_supp_list_active_limit_reached(supp_list_t *active_supp_list, uint16_t max_number);
 
 /**
  *  ws_pae_lib_supp_list_kmp_count counts the number of KMPs of a certain type in a list of supplicants
@@ -335,6 +374,18 @@ void ws_pae_lib_supp_list_purge(supp_list_t *active_supp_list, supp_list_t *inac
 uint16_t ws_pae_lib_supp_list_kmp_count(supp_list_t *supp_list, kmp_type_e type);
 
 /**
+ *  ws_pae_lib_supp_list_kmp_receive_check check if received message is for this KMP in a list of supplicants
+ *
+ * \param supp_list list of supplicants
+ * \param pdu pdu
+ * \param size pdu size
+ *
+ * \return KMP api for the received message
+ *
+ */
+kmp_api_t *ws_pae_lib_supp_list_kmp_receive_check(supp_list_t *supp_list, const void *pdu, uint16_t size);
+
+/**
  *  ws_pae_lib_supp_list_entry_retry_timer_get checks if some supplicant has retry timer running
  *
  * \param supp_list list of supplicants
@@ -343,5 +394,63 @@ uint16_t ws_pae_lib_supp_list_kmp_count(supp_list_t *supp_list, kmp_type_e type)
  *
  */
 supp_entry_t *ws_pae_lib_supp_list_entry_retry_timer_get(supp_list_t *supp_list);
+
+/**
+ *  ws_pae_lib_shared_comp_list_init init shared component list
+ *
+ * \param comp_list component list
+ *
+ * \return < 0 failure
+ * \return >= 0 success
+ *
+ */
+int8_t ws_pae_lib_shared_comp_list_init(shared_comp_list_t *comp_list);
+
+/**
+ *  ws_pae_lib_shared_comp_list_free free shared component list
+ *
+ * \param comp_list component list
+ *
+ * \return < 0 failure
+ * \return >= 0 success
+ *
+ */
+int8_t ws_pae_lib_shared_comp_list_free(shared_comp_list_t *comp_list);
+
+/**
+ *  ws_pae_lib_shared_comp_list_add add to shared component list
+ *
+ * \param comp_list component list
+ * \param data shared component
+ *
+ * \return < 0 failure
+ * \return >= 0 success
+ *
+ */
+int8_t ws_pae_lib_shared_comp_list_add(shared_comp_list_t *comp_list, kmp_shared_comp_t *data);
+
+/**
+ *  ws_pae_lib_shared_comp_list_remove remove from shared component list
+ *
+ * \param comp_list component list
+ * \param data shared component
+ *
+ * \return < 0 failure
+ * \return >= 0 success
+ *
+ */
+int8_t ws_pae_lib_shared_comp_list_remove(shared_comp_list_t *comp_list, kmp_shared_comp_t *data);
+
+/**
+ *  ws_pae_lib_shared_comp_list_timeout timeout to shared component list
+ *
+ * \param comp_list component list
+ * \param ticks elapsed time in seconds
+ *
+ * \return < 0 failure
+ * \return >= 0 success
+ *
+ */
+int8_t ws_pae_lib_shared_comp_list_timeout(shared_comp_list_t *comp_list, uint16_t ticks);
 
 #endif /* WS_PAE_AUTH_H_ */

@@ -58,12 +58,14 @@ typedef struct etx_storage_s {
     unsigned        tmp_etx: 1;
     unsigned        linkIdr: 4;
     unsigned        etx_samples: 3;
+    unsigned        drop_bad_count: 2;
 } etx_storage_t;
 
 typedef struct etx_sample_storage_s {
     uint16_t           attempts_count;         /*!< TX attempt count */
     uint8_t            etx_timer;              /*!< Count down from configured value 0 means that ETX Update is possible done again*/
     uint8_t            received_acks;          /*!< Received ACK's */
+    uint8_t            transition_count;
 } etx_sample_storage_t;
 
 /**
@@ -76,8 +78,9 @@ typedef struct etx_sample_storage_s {
  * \param attempts number of attempts to send message
  * \param success was message sending successful
  * \param attribute_index Neighbour attribute index
+ * \param mac64_addr_ptr Neighbour MAC64
  */
-void etx_transm_attempts_update(int8_t interface_id, uint8_t attempts, bool success, uint8_t attribute_index);
+void etx_transm_attempts_update(int8_t interface_id, uint8_t attempts, bool success, uint8_t attribute_index, const uint8_t *mac64_addr_ptr);
 
 /**
  * \brief A function to update ETX value based on remote incoming IDR
@@ -88,8 +91,9 @@ void etx_transm_attempts_update(int8_t interface_id, uint8_t attempts, bool succ
  * \param interface_id Interface identifier
  * \param remote_incoming_idr Remote incoming IDR
  * \param attribute_index Neighbour attribute index
+ * \param mac64_addr_ptr Neighbour MAC64
  */
-void etx_remote_incoming_idr_update(int8_t interface_id, uint8_t remote_incoming_idr, uint8_t attribute_index);
+void etx_remote_incoming_idr_update(int8_t interface_id, uint8_t remote_incoming_idr, uint8_t attribute_index, const uint8_t *mac64_addr_ptr);
 
 /**
  * \brief A function to read ETX value
@@ -139,10 +143,11 @@ uint16_t etx_local_etx_read(int8_t interface_id, uint8_t attribute_index);
  * \param lqi link quality indicator
  * \param dbm measured dBm
  * \param attribute_index Neighbour attribute index
+ * \param mac64_addr_ptr Neighbour MAC64
  *
  * \return 0x0100 to 0xFFFF local incoming IDR value (8 bit fraction)
  */
-uint16_t etx_lqi_dbm_update(int8_t interface_id, uint8_t lqi, int8_t dbm, uint8_t attribute_index);
+uint16_t etx_lqi_dbm_update(int8_t interface_id, uint8_t lqi, int8_t dbm, uint8_t attribute_index, const uint8_t *mac64_addr_ptr);
 
 /**
  * \brief A function callback that indicates ETX value change
@@ -154,9 +159,10 @@ uint16_t etx_lqi_dbm_update(int8_t interface_id, uint8_t lqi, int8_t dbm, uint8_
  * \param previous_etx ETX value to what the current ETX was compared (8 bit fraction)
  * \param current_etx current ETX value (8 bit fraction)
  * \param attribute_index Neighbour attribute index
+ * \param mac64_addr_ptr Pointer to MAC64 for given etx update
  *
  */
-typedef void (etx_value_change_handler_t)(int8_t nwk_id, uint16_t previous_etx, uint16_t current_etx, uint8_t attribute_index);
+typedef void (etx_value_change_handler_t)(int8_t nwk_id, uint16_t previous_etx, uint16_t current_etx, uint8_t attribute_index, const uint8_t *mac64_addr_ptr);
 
 /**
  * \brief A function callback that indicates the number of accumulated TX failures
@@ -232,9 +238,10 @@ uint8_t etx_accum_failures_callback_register(nwk_interface_id nwk_id, int8_t int
  *  if that is set.
  *
  * \param attribute_index Neighbour attribute index
+ * \param mac64_addr_ptr Neighbour MAC64
  *
  */
-void etx_neighbor_remove(int8_t interface_id, uint8_t attribute_index);
+void etx_neighbor_remove(int8_t interface_id, uint8_t attribute_index, const uint8_t *mac64_addr_ptr);
 
 /**
  * \brief A function for update cached ETX calculation
@@ -273,6 +280,15 @@ bool etx_cached_etx_parameter_set(uint8_t min_wait_time, uint8_t etx_min_attempt
  *
  */
 void etx_max_update_set(uint16_t etx_max_update);
+
+/**
+ * \brief A function for configure limit for detect bad init ETX sample
+ *
+ * \param bad_link_level 0 No limit and >=2 Level
+ * \param max_allowed_drops How many init probe is accepted to drop 1-2 are possible values
+ *
+ */
+bool etx_allow_drop_for_poor_measurements(uint8_t bad_link_level, uint8_t max_allowed_drops);
 
 /**
  * \brief A function for set Maxium ETX value

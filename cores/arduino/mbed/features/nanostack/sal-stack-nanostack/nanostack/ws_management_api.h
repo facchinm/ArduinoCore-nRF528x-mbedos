@@ -30,6 +30,7 @@
 
 #include "ns_types.h"
 #include "net_interface.h" /* Declaration for channel_list_s. */
+#include "fhss_config.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -75,10 +76,16 @@ extern "C" {
 #define CHANNEL_SPACING_100 0x03 // 100 khz
 #define CHANNEL_SPACING_250 0x04 // 250 khz
 
-#define NETWORK_SIZE_CERTIFICATE    0x00
-#define NETWORK_SIZE_SMALL          0x01
-#define NETWORK_SIZE_MEDIUM         0x08
-#define NETWORK_SIZE_LARGE          0x10
+/*
+ *  Network Size definitions are device amount in hundreds of devices.
+ *  These definitions are meant to give some estimates of sizes. Any value can be given as parameter
+ */
+
+#define NETWORK_SIZE_CERTIFICATE    0x00  // Network configuration used in Wi-SUN certification
+#define NETWORK_SIZE_SMALL          0x01  // Small networks
+#define NETWORK_SIZE_MEDIUM         0x08  // 100 - 800 device networks are medium sized
+#define NETWORK_SIZE_LARGE          0x0F  // 800 - 1500 device networks are large
+#define NETWORK_SIZE_XLARGE         0x19  // 2500+ devices
 #define NETWORK_SIZE_AUTOMATIC      0xFF
 
 /** Temporary API change flag. this will be removed when new version of API is implemented on applications
@@ -95,6 +102,26 @@ typedef struct ws_statistics {
     /** Asynch RX counter */
     uint32_t asynch_rx_count;
 } ws_statistics_t;
+
+/**
+ * \brief Struct ws_info defines the Wi-SUN stack state.
+ */
+typedef struct ws_stack_info {
+    /** Parent link local address */
+    uint8_t parent[16];
+    /** parent RSSI Out measured RSSI value calculated using EWMA specified by Wi-SUN from range of -174 (0) to +80 (254) dBm.*/
+    uint8_t rsl_out;
+    /** parent RSSI in measured RSSI value calculated using EWMA specified by Wi-SUN from range of -174 (0) to +80 (254) dBm.*/
+    uint8_t rsl_in;
+    /** Device RF minimum sensitivity configuration. lowest level of radio signal strength packet heard. Range of -174 (0) to +80 (254) dBm*/
+    uint8_t device_min_sens;
+    /** ETX To border router */
+    uint16_t routing_cost;
+    /** Network PAN ID */
+    uint16_t pan_id;
+    /** Wi-SUN join state defined by Wi-SUN specification 1-5*/
+    uint8_t join_state;
+} ws_stack_info_t;
 
 /**
  * Initialize Wi-SUN stack.
@@ -229,9 +256,9 @@ int ws_management_regulatory_domain_validate(
  *
  * timing parameters follows the specification example from Wi-SUN specification
  *
- * Default value: medium
- * small network size: hundreds of devices
- * Large network size: thousands of devices
+ * Default value: medium 100 - 800 device
+ * small network size: less than 100 devices
+ * Large network size: 800 - 1500 devices
  * automatic: when discovering the network network size is learned
  *            from advertisements and timings adjusted accordingly
  *
@@ -575,6 +602,44 @@ int ws_statistics_start(
  */
 int ws_statistics_stop(
     int8_t interface_id);
+
+/**
+ * Get information from the stack state.
+ * Parent information and link qualities with stack state info
+ *
+ * \param interface_id Network interface ID.
+ * \param info_ptr Pointer to stored stack state.
+ *
+ * \return 0 Success.
+ * \return <0 Failure.
+ */
+int ws_stack_info_get(
+    int8_t interface_id,
+    ws_stack_info_t *info_ptr);
+
+/**
+ * Set minimum RF sensitivity acceptable for the parent selection
+ *
+ * Set radio signal minimum sensitivity level acceptable for parent selection.
+ * Range of -174 (0) to +80 (254) dBm.
+ *
+ * If device_min_sens is set to 0 then automatic adjustment is done by the stack.
+ *
+ * Setting a value that is not suitable for Radio might prevent the device joining to the network.
+ *
+ * NOTE: Currently lower EAPOL parents are accepted if there is no parents higher than
+ *       DEVICE_MIN_SENS + CAND_PARENT_THRESHOLD + CAND_PARENT_HYSTERESIS
+ * NOTE: Currently not using this value to limit parents as it is only RECOMENDED in specification.
+ *
+ * \param interface_id Network interface ID.
+ * \param device_min_sens value used in the parent selections.
+ *
+ * \return 0 Success.
+ * \return <0 Failure.
+ */
+int ws_device_min_sens_set(
+    int8_t interface_id,
+    uint8_t device_min_sens);
 
 #ifdef __cplusplus
 }

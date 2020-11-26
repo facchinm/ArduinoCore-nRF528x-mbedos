@@ -67,6 +67,7 @@ typedef struct ws_pan_information_s {
     uint16_t pan_version;       /**< Pan configuration version will be updatd by Border router at PAN. */
     bool use_parent_bs: 1;      /**< 1 for force to follow parent broadcast schedule. 0 node may define own schedule. */
     bool rpl_routing_method: 1; /**< 1 when RPL routing is selected and 0 when L2 routing. */
+    bool pan_version_set: 1;    /**< 1 PAN version is set. */
     unsigned version: 3;        /**< Pan version support. */
 } ws_pan_information_t;
 
@@ -130,6 +131,13 @@ typedef struct ws_bt_ie {
     uint_fast24_t broadcast_interval_offset;
 } ws_bt_ie_t;
 
+/**
+ * @brief ws_fc_ie_t WS FC-IE element
+ */
+typedef struct ws_fc_ie {
+    uint8_t tx_flow_ctrl;
+    uint8_t rx_flow_ctrl;
+} ws_fc_ie_t;
 
 /**
  * @brief ws_channel_plan_zero_t WS channel plan 0 define domain and class
@@ -232,15 +240,23 @@ typedef struct ws_bs_ie {
 #define WS_FAN_VERSION_1_0 1
 
 #define WS_NEIGHBOR_LINK_TIMEOUT 2200
+
+#define WS_NEIGHBOUR_TEMPORARY_NEIGH_MAX_LIFETIME 240
+#define WS_NEIGHBOUR_TEMPORARY_ENTRY_LIFETIME 5
+#define WS_NEIGHBOUR_DHCP_ENTRY_LIFETIME 60
 #define WS_NEIGHBOR_TEMPORARY_LINK_MIN_TIMEOUT_LARGE 520
 #define WS_NEIGHBOR_TEMPORARY_LINK_MIN_TIMEOUT_SMALL 260
 #define WS_NEIGHBOR_NUD_TIMEOUT WS_NEIGHBOR_LINK_TIMEOUT / 2
 
+#define WS_EAPOL_TEMPORARY_ENTRY_SMALL_TIMEOUT 330
+#define WS_EAPOL_TEMPORARY_ENTRY_MEDIUM_TIMEOUT WS_EAPOL_TEMPORARY_ENTRY_SMALL_TIMEOUT
+#define WS_EAPOL_TEMPORARY_ENTRY_LARGE_TIMEOUT 750
+
 #define WS_NEIGHBOR_ETX_SAMPLE_MAX 3
 #define WS_NEIGHBOR_FIRST_ETX_SAMPLE_MIN_COUNT 3 //This can't be bigger than WS_NEIGHBOR_ETX_SAMPLE_MAX
-#define WS_NEIGHBOUR_MAX_CANDIDATE_PROBE 5
 
-#define WS_PROBE_INIT_BASE_SECONDS 8
+#define WS_SMALL_PROBE_INIT_BASE_SECONDS 4
+#define WS_NORMAL_PROBE_INIT_BASE_SECONDS 8
 
 #define WS_NUD_RAND_PROBABILITY 1
 
@@ -254,6 +270,10 @@ typedef struct ws_bs_ie {
 #define WS_ETX_MAX 1024
 
 #define WS_ETX_MIN_WAIT_TIME 60
+
+#define WS_ETX_BAD_INIT_LINK_LEVEL 3 //3 or higher attempt count will be dropped
+#define WS_ETX_MAX_BAD_LINK_DROP 2 //Drop 2 bad link from init 3
+
 
 #define WS_RPL_PARENT_CANDIDATE_MAX 5
 #define WS_RPL_SELECTED_PARENT_MAX 2
@@ -295,6 +315,38 @@ typedef struct ws_bs_ie {
  */
 #define WS_TACK_MAX_MS 5
 
+
+/* WS requires at least 19 MAC retransmissions (total 1+19=20 attempts). Default 802.15.4 macMaxFrameRetries is 3 (total 1+3=4 attempts).
+ * At least 4 channel retries must be used: (Initial channel + WS_NUMBER_OF_CHANNEL_RETRIES) * MAC attempts = (1+4)*4=20 attempts
+ *
+ * Valid settings could be for example:
+ * WS_MAX_FRAME_RETRIES     WS_NUMBER_OF_CHANNEL_RETRIES    Total attempts
+ * 0                        19                              1+0*1+19=20
+ * 1                        9                               1+1*1+9=20
+ * 2                        6                               1+2*1+6=21
+ * 3                        4                               1+3*1+4=20
+ *
+ */
+// This configuration is used when bootstrap is ready
+#define WS_MAX_FRAME_RETRIES            3
+#define WS_NUMBER_OF_CHANNEL_RETRIES    4
+// This configuration is used during bootstrap
+#define WS_MAX_FRAME_RETRIES_BOOTSTRAP          0
+#define WS_NUMBER_OF_CHANNEL_RETRIES_BOOTSTRAP  19
+
+
+#if (1 + WS_MAX_FRAME_RETRIES) * (1 + WS_NUMBER_OF_CHANNEL_RETRIES) < 20
+#warning "MAX frame retries set too low"
+#endif
+
+/*
+ * Automatic CCA threshold: default threshold and range in dBm.
+ */
+#define CCA_DEFAULT_DBM -60
+#define CCA_HIGH_LIMIT  -60
+#define CCA_LOW_LIMIT   -100
+
+
 /*
  * Config new version consistent filter period in 100ms periods
  */
@@ -303,7 +355,7 @@ typedef struct ws_bs_ie {
 // With FHSS we need to check CCA twice on TX channel
 #define WS_NUMBER_OF_CSMA_PERIODS  2
 // Interval between two CCA checks
-#define WS_CSMA_MULTI_CCA_INTERVAL 1000
+#define WS_CSMA_MULTI_CCA_INTERVAL 2000
 
 /* Default FHSS timing information
  *
