@@ -140,6 +140,7 @@
 -iwithprefixbefore/mbed/features/nanostack/sal-stack-nanostack/source/Service_Libs/Neighbor_cache
 -iwithprefixbefore/mbed/features/nanostack/sal-stack-nanostack/source/Service_Libs
 -iwithprefixbefore/mbed/features/nanostack/sal-stack-nanostack/source/Security/protocols/tls_sec_prot
+-iwithprefixbefore/mbed/features/nanostack/sal-stack-nanostack/source/Security/protocols/radius_sec_prot
 -iwithprefixbefore/mbed/features/nanostack/sal-stack-nanostack/source/Security/protocols/key_sec_prot
 -iwithprefixbefore/mbed/features/nanostack/sal-stack-nanostack/source/Security/protocols/gkh_sec_prot
 -iwithprefixbefore/mbed/features/nanostack/sal-stack-nanostack/source/Security/protocols/fwh_sec_prot

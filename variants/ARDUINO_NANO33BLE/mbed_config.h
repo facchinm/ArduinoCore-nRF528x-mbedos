@@ -224,6 +224,9 @@
 #define MBED_CONF_MBED_MESH_API_HEAP_SIZE                                     32500                                                                                            // set by library:mbed-mesh-api
 #define MBED_CONF_MBED_MESH_API_HEAP_STAT_INFO                                NULL                                                                                             // set by library:mbed-mesh-api
 #define MBED_CONF_MBED_MESH_API_MAC_NEIGH_TABLE_SIZE                          32                                                                                               // set by library:mbed-mesh-api
+#define MBED_CONF_MBED_MESH_API_RADIUS_RETRY_COUNT                            3                                                                                                // set by library:mbed-mesh-api
+#define MBED_CONF_MBED_MESH_API_RADIUS_RETRY_IMAX                             30                                                                                               // set by library:mbed-mesh-api
+#define MBED_CONF_MBED_MESH_API_RADIUS_RETRY_IMIN                             20                                                                                               // set by library:mbed-mesh-api
 #define MBED_CONF_MBED_MESH_API_THREAD_CONFIG_CHANNEL                         22                                                                                               // set by library:mbed-mesh-api
 #define MBED_CONF_MBED_MESH_API_THREAD_CONFIG_CHANNEL_MASK                    0x7fff800                                                                                        // set by library:mbed-mesh-api
 #define MBED_CONF_MBED_MESH_API_THREAD_CONFIG_CHANNEL_PAGE                    0                                                                                                // set by library:mbed-mesh-api
