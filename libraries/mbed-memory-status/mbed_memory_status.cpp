@@ -205,21 +205,21 @@ static void nway_print_label(const char * label)
 #endif
 }
 
-static const char HEX[] = "0123456789ABCDEF";
+static const char _HEX[] = "0123456789ABCDEF";
 
 static void debug_print_u32(uint32_t u32)
 {
     char output[9] = {0};
 
     // Always printed as big endian.
-    output[0] = HEX[(((uint32_t) u32 & 0xf0000000) >> 28)];
-    output[1] = HEX[(((uint32_t) u32 & 0x0f000000) >> 24)];
-    output[2] = HEX[(((uint32_t) u32 & 0x00f00000) >> 20)];
-    output[3] = HEX[(((uint32_t) u32 & 0x000f0000) >> 16)];
-    output[4] = HEX[(((uint32_t) u32 & 0x0000f000) >> 12)];
-    output[5] = HEX[(((uint32_t) u32 & 0x00000f00) >>  8)];
-    output[6] = HEX[(((uint32_t) u32 & 0x000000f0) >>  4)];
-    output[7] = HEX[(((uint32_t) u32 & 0x0000000f) >>  0)];
+    output[0] = _HEX[(((uint32_t) u32 & 0xf0000000) >> 28)];
+    output[1] = _HEX[(((uint32_t) u32 & 0x0f000000) >> 24)];
+    output[2] = _HEX[(((uint32_t) u32 & 0x00f00000) >> 20)];
+    output[3] = _HEX[(((uint32_t) u32 & 0x000f0000) >> 16)];
+    output[4] = _HEX[(((uint32_t) u32 & 0x0000f000) >> 12)];
+    output[5] = _HEX[(((uint32_t) u32 & 0x00000f00) >>  8)];
+    output[6] = _HEX[(((uint32_t) u32 & 0x000000f0) >>  4)];
+    output[7] = _HEX[(((uint32_t) u32 & 0x0000000f) >>  0)];
 
     nway_print_label(output);
 }
